@@ -6,7 +6,7 @@
 class Stack{
     public:
     Stack();
-    void Push(uint16_t address)
+    void Push(uint16_t address);
     uint16_t Pop();
 
     private:
