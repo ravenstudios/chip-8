@@ -1,11 +1,13 @@
 #include "raylib.h"
 #include "Constants.h"
 #include "Screen.h"
+#include "Registers.h"
 
 
 
 void update(){
     screen.Update();
+    registers.Update();
 }
 
 
@@ -14,6 +16,7 @@ void draw(){
     ClearBackground(BLACK);
 
     screen.Draw();
+    registers.Draw();
 
     EndDrawing();
     

@@ -31,8 +31,8 @@ void Screen::Draw(){
                 color = BLACK;
             }
 
-            int x = m_Pixels[c][r].x * BS + X_OFFSET;
-            int y = m_Pixels[c][r].y * BS + Y_OFFSET;
+            int x = m_Pixels[c][r].x * BS + SCREEN_X_OFFSET;
+            int y = m_Pixels[c][r].y * BS + SCREEN_Y_OFFSET;
             // std::cout << "X:" << x << "\n";
             
             DrawRectangle(x, y, BS, BS, color);

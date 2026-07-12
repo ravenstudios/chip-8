@@ -10,6 +10,7 @@ find_package(raylib REQUIRED)
 add_executable(Chip8
     src/main.cpp
     src/Screen.cpp
+    src/Registers.cpp
 )
 
 target_link_libraries(Chip8 PRIVATE raylib)
