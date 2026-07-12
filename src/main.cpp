@@ -2,7 +2,7 @@
 #include "Constants.h"
 #include "Screen.h"
 #include "Registers.h"
-
+#include "Cpu.h"
 
 
 
@@ -18,6 +18,7 @@ void draw(){
 
     screen.Draw();
     registers.Draw();
+    cpu.Draw();
 
     EndDrawing();
     
