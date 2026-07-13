@@ -9,6 +9,6 @@ class Memory{
         void SetMemory(uint16_t);
 
     private:
-        std::array<uint8_t, 4000> m_Memory;
+        std::array<uint8_t, 4096> m_Memory;
 };
 extern Memory memory;

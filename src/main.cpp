@@ -3,12 +3,15 @@
 #include "Screen.h"
 #include "Registers.h"
 #include "Cpu.h"
+#include "Buttons.h"
+#include <string>
 
-
+Button btn_next = Button(CPU_X_OFFSET, 500, 100, 50, "Next", [](){cpu.ExecuteCycle();});
 
 void update(){
     screen.Update();
     registers.Update();
+    btn_next.Update();
 }
 
 
@@ -19,7 +22,7 @@ void draw(){
     screen.Draw();
     registers.Draw();
     cpu.Draw();
-
+    btn_next.Draw();
     EndDrawing();
     
 }

@@ -9,10 +9,10 @@ class CPU{
         void Decode();
         void Draw();
         void DrawStack();
-        std::string GetCurrentOpCode();
+        uint16_t GetCurrentOpCode() const;
 
 
     private:
-        std::string m_CurrentOpCode = "0000";
+        uint16_t m_CurrentOpCode = 0;
 };
 extern CPU cpu;

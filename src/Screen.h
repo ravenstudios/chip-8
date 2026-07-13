@@ -11,6 +11,8 @@ class Screen{
         Screen();
         void Update();
         void Draw();
+        void SetPixel(int x, int y, bool active);
+        bool GetPixel(int x, int y);
 
     private:
         static const int m_COLS = 64;

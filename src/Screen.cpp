@@ -41,3 +41,10 @@ void Screen::Draw(){
     }
 }
 
+void Screen::SetPixel(int x, int y, bool active){
+    m_Pixels[x][y].is_active = active;
+}
+
+ bool Screen::GetPixel(int x, int y){
+    return  m_Pixels[x][y].is_active;
+ }

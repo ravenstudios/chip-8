@@ -9,7 +9,7 @@ class Registers{
     void Update();
     void Draw();
     uint8_t GetRegister(uint8_t r);
-    void SetRegister(uint8_t r);
+    void SetRegister(uint8_t reg, uint8_t val);
 
     private:
         std::array<uint8_t, 16> m_Registers;

@@ -15,6 +15,9 @@ add_executable(Chip8
     src/ProgramCounter.cpp
     src/CPU.cpp
     src/Memory.cpp
+    src/Buttons.cpp
+    src/OpCode.cpp
+    src/IndexRegister.cpp
 )
 
 target_link_libraries(Chip8 PRIVATE raylib)

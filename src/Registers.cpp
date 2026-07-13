@@ -27,12 +27,12 @@ void Registers::Draw(){
 
 
 uint8_t Registers::GetRegister(uint8_t r){
-    return 0;
+    return m_Registers[r];
 }
 
 
-void Registers::SetRegister(uint8_t r){
-
+void Registers::SetRegister(uint8_t reg, uint8_t val){
+    m_Registers[reg] = val;
 }
 
 
