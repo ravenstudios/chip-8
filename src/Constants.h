@@ -21,3 +21,9 @@ constexpr int STACK_X_OFFSET = 450;
 constexpr int STACK_Y_OFFSET = 350;
 constexpr int STACK_W = 100;
 constexpr int STACK_H = FONT_SIZE * 16;
+
+constexpr int KEYPAD_X = 550;
+constexpr int KEYPAD_Y = 350;
+constexpr int KEYPAD_W = 200;
+constexpr int KEYPAD_H = 200;
+constexpr int BTN_SIZE = 64;

@@ -5,13 +5,14 @@
 #include "Cpu.h"
 #include "Buttons.h"
 #include <string>
-
+#include "Keypad.h"
 Button btn_next = Button(CPU_X_OFFSET, 500, 100, 50, "Next", [](){cpu.ExecuteCycle();});
 
 void update(){
     screen.Update();
     registers.Update();
     btn_next.Update();
+    keypad.Update();
 }
 
 
@@ -23,6 +24,7 @@ void draw(){
     registers.Draw();
     cpu.Draw();
     btn_next.Draw();
+    keypad.Draw();
     EndDrawing();
     
 }

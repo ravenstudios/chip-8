@@ -18,6 +18,8 @@ add_executable(Chip8
     src/Buttons.cpp
     src/OpCode.cpp
     src/IndexRegister.cpp
+    src/Keypad.cpp
+    
 )
 
 target_link_libraries(Chip8 PRIVATE raylib)
