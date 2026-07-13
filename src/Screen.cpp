@@ -31,7 +31,7 @@ void Screen::Draw(){
             // std::cout << "X:" << x << "\n";
             
             DrawRectangle(x, y, BS, BS, color);
-            DrawRectangleLines(x, y, BS, BS, WHITE);
+            // DrawRectangleLines(x, y, BS, BS, WHITE);
         }
     }
 }

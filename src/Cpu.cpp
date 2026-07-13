@@ -54,14 +54,14 @@ void CPU::Decode(){
     uint8_t nn    = opcode & 0x00FF;
     uint16_t nnn  = opcode & 0x0FFF;
 
-    std::cout
-    << "First: " << static_cast<int>(first)
-    << " x: "    << static_cast<int>(x)
-    << " y: "    << static_cast<int>(y)
-    << " n: "    << static_cast<int>(n)
-    << " nn: "   << static_cast<int>(nn)
-    << " nnn: "  << nnn
-    << '\n';
+    // std::cout
+    // << "First: " << static_cast<int>(first)
+    // << " x: "    << static_cast<int>(x)
+    // << " y: "    << static_cast<int>(y)
+    // << " n: "    << static_cast<int>(n)
+    // << " nn: "   << static_cast<int>(nn)
+    // << " nnn: "  << nnn
+    // << '\n';
 
 
     opCode.Decode(first, x, y, n, nn, nnn, opcode);
@@ -108,3 +108,34 @@ void CPU::DrawStack(){
     }
    
 }
+
+uint8_t CPU::GetDelayTimer() const{
+    return m_DelayTimer;
+}
+
+
+uint8_t CPU::GetSoundTimer() const{
+    return m_SoundTimer;
+}
+
+
+
+void CPU::SetDelayTimer(uint8_t value){
+    m_DelayTimer = value;
+}
+
+
+void CPU::SetSoundTimer(uint8_t value){
+    m_SoundTimer = value;
+}
+
+void CPU::UpdateTimers(){
+    if (m_DelayTimer > 0){
+        --m_DelayTimer;
+    }
+
+    if (m_SoundTimer > 0){
+        --m_SoundTimer;
+    }
+}
+

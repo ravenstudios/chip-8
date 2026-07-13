@@ -7,6 +7,8 @@
 #include "raylib.h"
 #include "Memory.h"
 #include "Stack.h"
+#include "Keypad.h"
+#include "Cpu.h"
 
 OpCode opCode;
 
@@ -15,7 +17,7 @@ OpCode::OpCode(){
    
 }
 
-void OpCode::Decode(uint8_t first, uint8_t x, uint8_t y, uint8_t n, uint16_t nn, uint16_t nnn, uint16_t opcode){
+void OpCode::Decode(uint8_t first, uint8_t x, uint8_t y, uint8_t n, uint8_t nn, uint16_t nnn, uint16_t opcode){
    switch (first){
       case 0x0:
          switch (opcode){
@@ -49,7 +51,12 @@ void OpCode::Decode(uint8_t first, uint8_t x, uint8_t y, uint8_t n, uint16_t nn,
          break;
 
       case 0x5:
-         OP_5XY0(x, y);
+         if(n == 0x0){
+            OP_5XY0(x, y);
+         }
+         else{
+            std::cerr << "Unknown opcode: " << std::hex << opcode << '\n';
+         }
          break;
 
       case 0x6:
@@ -96,7 +103,13 @@ void OpCode::Decode(uint8_t first, uint8_t x, uint8_t y, uint8_t n, uint16_t nn,
          break;
       
       case 0x9:
-         OP_9XY0(x, y);
+         if(n == 0x0){
+            OP_9XY0(x, y);
+         }
+         else{
+            std::cerr << "Unknown opcode: " << std::hex << opcode << '\n';
+         }
+         
          break;
       case 0xA:
          OP_ANNN(nnn);
@@ -110,11 +123,57 @@ void OpCode::Decode(uint8_t first, uint8_t x, uint8_t y, uint8_t n, uint16_t nn,
       case 0xD:
          OP_DXYN(x, y, n);
          break;
-
+      case 0xE:
+         switch (nn){
+         case 0x9E:
+            OP_EX9E(x);
+            break;
+         case 0xA1:
+            OP_EXA1(x);
+            break;
+         default:
+            break;
+         }
+         break;
+      case 0xF:
+         switch (nn){
+         case 0x07:
+            OP_FX07(x);
+            break;
+         case 0x0A:
+            OP_FX0A(x);
+            break;
+         case 0x15:
+            OP_FX15(x);
+            break;
+         case 0x18:
+            OP_FX18(x);
+            break;
+         case 0x1E:
+            OP_FX1E(x);
+            break;
+         case 0x29:
+            OP_FX29(x);
+            break;
+         case 0x33:
+            OP_FX33(x);
+            break;
+         case 0x55:
+            OP_FX55(x);
+            break;
+         case 0x65:
+            OP_FX65(x);
+            break;
+         
+         default:
+            break;
+         }
+         break;
       default:
          break;
       }
 }
+
 
 void OpCode::OP_0NNN(uint16_t nnn){
    return;
@@ -142,14 +201,14 @@ void OpCode::OP_2NNN(uint16_t nnn){
 }
 
 
-void OpCode::OP_3XNN(uint16_t vx, uint16_t nn){
+void OpCode::OP_3XNN(uint8_t vx, uint8_t nn){
    if(registers.GetRegister(vx) == nn){
       programCounter.IncPC(2);
    }
 }
 
 
-void OpCode::OP_4XNN(uint8_t vx, uint16_t nn){
+void OpCode::OP_4XNN(uint8_t vx, uint8_t nn){
    if(registers.GetRegister(vx) != nn){
       programCounter.IncPC(2);
    }
@@ -164,14 +223,11 @@ void OpCode::OP_5XY0(uint8_t vx, uint8_t vy){
 
 
 void OpCode::OP_6XNN(uint8_t reg, uint8_t val){
-   // std::cout << "reg: " << static_cast<int>(reg) << " val:" << static_cast<int>(val) << "\n";
    registers.SetRegister(reg, val);
 }
 
 void OpCode::OP_7XNN(uint8_t reg, uint8_t val){
-   std::cout << "reg: " << static_cast<int>(reg) << " val:" << static_cast<int>(val) << "\n";
    uint8_t current = registers.GetRegister(reg) + val;
-   std::cout << "current:" << registers.GetRegister(reg) << "\n";
    registers.SetRegister(reg, current);
 }
 
@@ -267,8 +323,8 @@ void OpCode::OP_BNNN(uint16_t address){
 
 
 void OpCode::OP_CXNN(uint8_t reg, uint8_t nn){
-   uint8_t rand = GetRandomValue(0, 255);
-   registers.SetRegister(reg, nn & rand);
+   uint8_t randByte = GetRandomValue(0, 255);
+   registers.SetRegister(reg, nn & randByte);
 }
 
 
@@ -301,5 +357,88 @@ void OpCode::OP_DXYN(uint8_t reg1, uint8_t reg2, uint8_t n){
             screen.SetPixel(x, y, !oldPixel);
         }
     }
+}
+
+
+void OpCode::OP_EX9E(uint8_t vx){
+   if (keypad.GetKey(registers.GetRegister(vx))){
+      programCounter.IncPC(2);
+   }
+}
+
+
+void OpCode::OP_EXA1(uint8_t vx){
+   if (!keypad.GetKey(registers.GetRegister(vx))){
+      programCounter.IncPC(2);
+   }
+}
+
+
+void OpCode::OP_FX07(uint8_t vx){
+   registers.SetRegister(vx, cpu.GetDelayTimer());
+}
+
+
+void OpCode::OP_FX0A(uint8_t vx){
+   for (uint8_t key = 0; key < 16; key++)
+    {
+        if (keypad.GetKey(key))
+        {
+            registers.SetRegister(vx, key);
+            return;
+        }
+    }
+    programCounter.IncPC(-2);
+}
+
+
+void OpCode::OP_FX15(uint8_t vx){
+   cpu.SetDelayTimer(registers.GetRegister(vx));
+}
+
+
+void OpCode::OP_FX18(uint8_t vx){
+   cpu.SetSoundTimer(registers.GetRegister(vx));
+}
+
+
+void OpCode::OP_FX1E(uint8_t vx){
+   uint16_t val = registers.GetRegister(vx);
+    indexRegister.Set(indexRegister.Get() + val);
+}
+
+
+void OpCode::OP_FX29(uint8_t vx){
+   constexpr uint16_t FONT_START = 0x050;
+   constexpr uint8_t FONT_HEIGHT = 5;
+   uint8_t digit = registers.GetRegister(vx) & 0x0F;
+   indexRegister.Set(FONT_START + digit * FONT_HEIGHT);
+   
+}
+
+
+void OpCode::OP_FX33(uint8_t vx){
+   uint8_t value = registers.GetRegister(vx);
+   uint16_t i = indexRegister.Get();
+
+   memory.SetMemory(i,     value / 100);
+   memory.SetMemory(i + 1, (value / 10) % 10);
+   memory.SetMemory(i + 2, value % 10);
+}
+
+
+void OpCode::OP_FX55(uint8_t vx){
+   uint16_t idx = indexRegister.Get();
+   for (uint8_t i = 0; i <= vx; i++){
+      memory.SetMemory(idx + i, registers.GetRegister(i));
+   }
+}
+
+
+void OpCode::OP_FX65(uint8_t vx){
+   uint16_t idx = indexRegister.Get();
+   for (uint8_t i = 0; i <= vx; i++){
+      registers.SetRegister(i, memory.GetMemory(idx + i));
+   }
 }
 

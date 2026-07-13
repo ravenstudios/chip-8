@@ -1,3 +1,5 @@
+constexpr int CYCLES_PER_FRAME = 12;
+
 constexpr int BS = 8;
 constexpr int SCREEN_W = 1024;
 constexpr int SCREEN_H = 720;

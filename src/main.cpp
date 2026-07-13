@@ -9,10 +9,17 @@
 Button btn_next = Button(CPU_X_OFFSET, 500, 100, 50, "Next", [](){cpu.ExecuteCycle();});
 
 void update(){
+
+    for (int i = 0; i < 12; i++){
+        cpu.ExecuteCycle();
+    }
+
+    cpu.UpdateTimers();
     screen.Update();
     registers.Update();
     btn_next.Update();
     keypad.Update();
+
 }
 
 
@@ -33,6 +40,7 @@ void draw(){
 int main()
 {
     InitWindow(SCREEN_W, SCREEN_H, "Chip-8");
+    SetTargetFPS(60);
 
     while (!WindowShouldClose())
     {

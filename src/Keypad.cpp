@@ -48,6 +48,10 @@ void Keypad::Keypress(uint8_t key){
 
 
 bool Keypad::GetKey(uint8_t key) const{
+    if(key >= 16){
+       return false;
+    }
+    
     return m_KeyStates[key];
 }
 
