@@ -64,7 +64,7 @@ void CPU::Decode(){
     << '\n';
 
 
-    opCode.Decode(first, x, y, n, nn, nnn);
+    opCode.Decode(first, x, y, n, nn, nnn, opcode);
 }
 
 uint16_t CPU::GetCurrentOpCode() const{

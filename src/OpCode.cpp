@@ -6,6 +6,7 @@
 #include "Screen.h"
 #include "raylib.h"
 #include "Memory.h"
+#include "Stack.h"
 
 OpCode opCode;
 
@@ -14,49 +15,80 @@ OpCode::OpCode(){
    
 }
 
-void OpCode::Decode(uint8_t first, uint8_t x, uint8_t y, uint8_t n, uint16_t nn, uint16_t nnn){
+void OpCode::Decode(uint8_t first, uint8_t x, uint8_t y, uint8_t n, uint16_t nn, uint16_t nnn, uint16_t opcode){
    switch (first){
+      case 0x0:
+         switch (opcode){
+            case 0x00E0:
+               OP_00E0();
+               break;
+         
+            case 0x00EE:
+               OP_00EE();
+               break;
+            
+            default:
+               OP_0NNN(nnn);
+               break;
+         }
+         break;
       case 0x1:
-         opCode.OP1NNN(nnn);
+         OP_1NNN(nnn);
+         break;
+      
+      case 0x2:
+         OP_2NNN(nnn);
+         break;
+
+      case 0x3:
+         OP_3XNN(x, nn);
+         break;
+
+      case 0x4:
+         OP_4XNN(x, nn);
+         break;
+
+      case 0x5:
+         OP_5XY0(x, y);
          break;
 
       case 0x6:
-         opCode.OP6XNN(x, nn);
+         OP_6XNN(x, nn);
          break;
       
       case 0x7:
-         opCode.OP7XNN(x, nn);
+         OP_7XNN(x, nn);
          break;
       
       case 0x8:
          switch (n)
          {
          case 0x0:
-            OP8XY0(x, y);
+            OP_8XY0(x, y);
             break;
          case 0x1:
-            OP8XY1(x, y);
+            OP_8XY1(x, y);
             break;
          case 0x2:
-            OP8XY2(x, y);
+            OP_8XY2(x, y);
             break;
          case 0x3:
-            OP8XY3(x, y);
+            OP_8XY3(x, y);
             break;
          case 0x4:
-            OP8XY4(x, y);
+            OP_8XY4(x, y);
             break;
          case 0x5:
-            OP8XY5(x, y);
+            OP_8XY5(x, y);
             break;
          case 0x6:
-            OP8XY6(x, y);
+            OP_8XY6(x, y);
             break;
          case 0x7:
-            OP8XY7(x, y);
+            OP_8XY7(x, y);
             break;
          case 0xE:
-            OP8XYE(x, y);
+            OP_8XYE(x, y);
             break;
          default:
             break;
@@ -64,19 +96,19 @@ void OpCode::Decode(uint8_t first, uint8_t x, uint8_t y, uint8_t n, uint16_t nn,
          break;
       
       case 0x9:
-         OP9XY0(x, y);
+         OP_9XY0(x, y);
          break;
       case 0xA:
-         opCode.OPANNN(nnn);
+         OP_ANNN(nnn);
          break;
       case 0xB:
-         opCode.OPBNNN(nnn);
+         OP_BNNN(nnn);
          break;
       case 0xC:
-         opCode.OPCXNN(x, nn);
+         OP_CXNN(x, nn);
          break;
       case 0xD:
-         opCode.OPDXYN(x, y, n);
+         OP_DXYN(x, y, n);
          break;
 
       default:
@@ -84,32 +116,72 @@ void OpCode::Decode(uint8_t first, uint8_t x, uint8_t y, uint8_t n, uint16_t nn,
       }
 }
 
+void OpCode::OP_0NNN(uint16_t nnn){
+   return;
+}
 
 
-void OpCode::OP1NNN(uint16_t address){
+void OpCode::OP_00E0(){
+   screen.ClearScreen();
+}
+
+
+void OpCode::OP_00EE(){
+   uint16_t address = stack.Pop();
    programCounter.SetPC(address);
 }
 
 
-void OpCode::OP6XNN(uint8_t reg, uint8_t val){
+void OpCode::OP_1NNN(uint16_t address){
+   programCounter.SetPC(address);
+}
+
+void OpCode::OP_2NNN(uint16_t nnn){
+   stack.Push(programCounter.GetPC());
+   programCounter.SetPC(nnn);
+}
+
+
+void OpCode::OP_3XNN(uint16_t vx, uint16_t nn){
+   if(registers.GetRegister(vx) == nn){
+      programCounter.IncPC(2);
+   }
+}
+
+
+void OpCode::OP_4XNN(uint8_t vx, uint16_t nn){
+   if(registers.GetRegister(vx) != nn){
+      programCounter.IncPC(2);
+   }
+}
+
+
+void OpCode::OP_5XY0(uint8_t vx, uint8_t vy){
+   if(registers.GetRegister(vx) == registers.GetRegister(vy)){
+      programCounter.IncPC(2);
+   }
+}
+
+
+void OpCode::OP_6XNN(uint8_t reg, uint8_t val){
    // std::cout << "reg: " << static_cast<int>(reg) << " val:" << static_cast<int>(val) << "\n";
    registers.SetRegister(reg, val);
 }
 
-void OpCode::OP7XNN(uint8_t reg, uint8_t val){
+void OpCode::OP_7XNN(uint8_t reg, uint8_t val){
    std::cout << "reg: " << static_cast<int>(reg) << " val:" << static_cast<int>(val) << "\n";
    uint8_t current = registers.GetRegister(reg) + val;
    std::cout << "current:" << registers.GetRegister(reg) << "\n";
    registers.SetRegister(reg, current);
 }
 
-void OpCode::OP8XY0(uint8_t reg1, uint8_t reg2){
+void OpCode::OP_8XY0(uint8_t reg1, uint8_t reg2){
    uint8_t vy = registers.GetRegister(reg2);
    registers.SetRegister(reg1, vy);
 }
 
 
-void OpCode::OP8XY1(uint8_t reg1, uint8_t reg2){
+void OpCode::OP_8XY1(uint8_t reg1, uint8_t reg2){
    uint8_t vx = registers.GetRegister(reg1);
    uint8_t vy = registers.GetRegister(reg2);
    uint8_t val = vx | vy;
@@ -117,7 +189,7 @@ void OpCode::OP8XY1(uint8_t reg1, uint8_t reg2){
 }
 
 
-void OpCode::OP8XY2(uint8_t reg1, uint8_t reg2){
+void OpCode::OP_8XY2(uint8_t reg1, uint8_t reg2){
    uint8_t vx = registers.GetRegister(reg1);
    uint8_t vy = registers.GetRegister(reg2);
    uint8_t val = vx & vy;
@@ -125,7 +197,7 @@ void OpCode::OP8XY2(uint8_t reg1, uint8_t reg2){
 }
 
 
-void OpCode::OP8XY3(uint8_t reg1, uint8_t reg2){
+void OpCode::OP_8XY3(uint8_t reg1, uint8_t reg2){
    uint8_t vx = registers.GetRegister(reg1);
    uint8_t vy = registers.GetRegister(reg2);
    uint8_t val = vx ^ vy;
@@ -133,7 +205,7 @@ void OpCode::OP8XY3(uint8_t reg1, uint8_t reg2){
 }
 
 
-void OpCode::OP8XY4(uint8_t reg1, uint8_t reg2){
+void OpCode::OP_8XY4(uint8_t reg1, uint8_t reg2){
    uint8_t vx = registers.GetRegister(reg1);
    uint8_t vy = registers.GetRegister(reg2);
    uint16_t val = vx + vy;
@@ -142,7 +214,7 @@ void OpCode::OP8XY4(uint8_t reg1, uint8_t reg2){
 }
 
 
-void OpCode::OP8XY5(uint8_t reg1, uint8_t reg2){
+void OpCode::OP_8XY5(uint8_t reg1, uint8_t reg2){
    uint8_t vx = registers.GetRegister(reg1);
    uint8_t vy = registers.GetRegister(reg2);
    uint16_t val = vx - vy;
@@ -151,14 +223,14 @@ void OpCode::OP8XY5(uint8_t reg1, uint8_t reg2){
 }
 
 
-void OpCode::OP8XY6(uint8_t reg1, uint8_t reg2){
+void OpCode::OP_8XY6(uint8_t reg1, uint8_t reg2){
    uint8_t vx = registers.GetRegister(reg1);
    registers.SetRegister(0xF, vx & 0x01);
    registers.SetRegister(reg1, vx >> 1);
 }
 
 
-void OpCode::OP8XY7(uint8_t reg1, uint8_t reg2){
+void OpCode::OP_8XY7(uint8_t reg1, uint8_t reg2){
    uint8_t vx = registers.GetRegister(reg1);
    uint8_t vy = registers.GetRegister(reg2);
    uint16_t val = vy - vx;
@@ -167,13 +239,13 @@ void OpCode::OP8XY7(uint8_t reg1, uint8_t reg2){
 }
 
 
-void OpCode::OP8XYE(uint8_t reg1, uint8_t reg2){
+void OpCode::OP_8XYE(uint8_t reg1, uint8_t reg2){
    uint8_t vx = registers.GetRegister(reg1);
    registers.SetRegister(0xF, (vx >> 7) & 0x01);
    registers.SetRegister(reg1, vx << 1);
 }
 
-void OpCode::OP9XY0(uint8_t reg1, uint8_t reg2){
+void OpCode::OP_9XY0(uint8_t reg1, uint8_t reg2){
    uint8_t vx = registers.GetRegister(reg1);
    uint8_t vy = registers.GetRegister(reg2);
    if(vx == vy){
@@ -183,24 +255,24 @@ void OpCode::OP9XY0(uint8_t reg1, uint8_t reg2){
 }  
 
 
-void OpCode::OPANNN(uint16_t address){
+void OpCode::OP_ANNN(uint16_t address){
    indexRegister.Set(address);
 }
 
 
-void OpCode::OPBNNN(uint16_t address){
+void OpCode::OP_BNNN(uint16_t address){
    uint8_t vx = registers.GetRegister(0x0);
    programCounter.SetPC(vx + address);
 }
 
 
-void OpCode::OPCXNN(uint8_t reg, uint8_t nn){
+void OpCode::OP_CXNN(uint8_t reg, uint8_t nn){
    uint8_t rand = GetRandomValue(0, 255);
    registers.SetRegister(reg, nn & rand);
 }
 
 
-void OpCode::OPDXYN(uint8_t reg1, uint8_t reg2, uint8_t n){
+void OpCode::OP_DXYN(uint8_t reg1, uint8_t reg2, uint8_t n){
     uint8_t vx = registers.GetRegister(reg1);
     uint8_t vy = registers.GetRegister(reg2);
     uint16_t ir = indexRegister.Get();

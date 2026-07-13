@@ -6,12 +6,7 @@
 Screen screen;
 
 Screen::Screen(){
-    for(int c = 0; c < m_COLS; c++){
-        for(int r = 0; r < m_ROWS; r++){
-            m_Pixels[c][r].x = c;
-            m_Pixels[c][r].y = r;
-        }
-    }
+    ClearScreen();
 }
 
 
@@ -47,4 +42,14 @@ void Screen::SetPixel(int x, int y, bool active){
 
  bool Screen::GetPixel(int x, int y){
     return  m_Pixels[x][y].is_active;
+ }
+
+ void Screen::ClearScreen(){
+   for(int c = 0; c < m_COLS; c++){
+        for(int r = 0; r < m_ROWS; r++){
+            m_Pixels[c][r].x = c;
+            m_Pixels[c][r].y = r;
+            m_Pixels[c][r].is_active = false;
+        }
+    }
  }

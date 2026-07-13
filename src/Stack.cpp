@@ -7,12 +7,14 @@ Stack::Stack(){
 }
 
 void Stack::Push(uint16_t address){
-
+    m_Stack[m_StackPointer] = address;
+    m_StackPointer++;
 }
 
 
 uint16_t Stack::Pop(){
-
+    m_StackPointer--;
+    return m_Stack[m_StackPointer];
 }
 
 uint8_t Stack::GetSP() const{
@@ -21,5 +23,5 @@ uint8_t Stack::GetSP() const{
 }
 
 int Stack::GetAddress(uint16_t address){
-    return 0;
+    return m_Stack[address];
 }

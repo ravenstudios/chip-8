@@ -13,6 +13,7 @@ class Screen{
         void Draw();
         void SetPixel(int x, int y, bool active);
         bool GetPixel(int x, int y);
+        void ClearScreen();
 
     private:
         static const int m_COLS = 64;
